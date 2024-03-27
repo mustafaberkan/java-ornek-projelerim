@@ -1,0 +1,196 @@
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
+
+public class atm4 {
+    private static Map<String, Hesap> hesaplar = new HashMap<>();
+    private static Scanner scanner = new Scanner(System.in);
+
+    static class Hesap {
+        private String kullaniciAdi;
+        private String sifre;
+        private double bakiye;
+        private TransactionHistory transactionHistory;
+
+        public Hesap(String kullaniciAdi, String sifre, double bakiye) {
+            this.kullaniciAdi = kullaniciAdi;
+            this.sifre = sifre;
+            this.bakiye = bakiye;
+            this.transactionHistory = new TransactionHistory();
+        }
+
+        public String getKullaniciAdi() {
+            return kullaniciAdi;
+        }
+
+        public String getSifre() {
+            return sifre;
+        }
+
+        public double getBakiye() {
+            return bakiye;
+        }
+
+        public TransactionHistory getTransactionHistory() {
+            return transactionHistory;
+        }
+
+        public void setBakiye(double bakiye) {
+            this.bakiye = bakiye;
+        }
+    }
+
+    static class TransactionHistory {
+        private StringBuilder history;
+
+        public TransactionHistory() {
+            this.history = new StringBuilder();
+        }
+
+        public void addTransaction(String transaction) {
+            this.history.append(transaction).append("\n");
+        }
+
+        public String getHistory() {
+            return this.history.toString();
+        }
+    }
+
+    public static void main(String[] args) {
+        hesaplar.put("mustafa", new Hesap("mustafa", "12345", 1000.0));
+        hesaplar.put("berkan", new Hesap("berkan", "54321", 2000.0));
+
+        while (true) {
+            System.out.println("\nLütfen bir kullanıcı adı ve şifre girin:");
+            System.out.println("Kullanıcı Adı:");
+            String kullaniciAdi = scanner.nextLine();
+            System.out.println("Şifre:");
+            String sifre = scanner.nextLine();
+
+            if (hesaplar.containsKey(kullaniciAdi) && sifreDogru(kullaniciAdi, sifre)) {
+                System.out.println("Giriş başarılı.");
+                menuGoster(kullaniciAdi);
+                break;
+            } else {
+                System.out.println("Hatalı kullanıcı adı veya şifre. Tekrar deneyin.");
+            }
+        }
+    }
+
+    public static boolean sifreDogru(String kullaniciAdi, String girilenSifre) {
+        if (hesaplar.containsKey(kullaniciAdi)) {
+            String gercekSifre = hesaplar.get(kullaniciAdi).getSifre();
+            return girilenSifre.equals(gercekSifre);
+        } else {
+            return false;
+        }
+    }
+
+    public static void menuGoster(String kullaniciAdi) {
+        while (true) {
+            System.out.println("\n1. Bakiye Sorgula");
+            System.out.println("2. Para Çek");
+            System.out.println("3. Para Yatır");
+            System.out.println("4. Para Transferi");
+            System.out.println("5. İşlem Geçmişi");
+            System.out.println("6. Çıkış");
+            System.out.println("Lütfen bir seçim yapınız:");
+
+            int secim = scanner.nextInt();
+            scanner.nextLine(); // Dummy nextLine() call to clear the input buffer
+
+            switch (secim) {
+                case 1:
+                    bakiyeSorgula(kullaniciAdi);
+                    break;
+                case 2:
+                    paraCek(kullaniciAdi);
+                    break;
+                case 3:
+                    paraYatir(kullaniciAdi);
+                    break;
+                case 4:
+                    paraTransferi(kullaniciAdi);
+                    break;
+                case 5:
+                    islemGecmisiGoster(kullaniciAdi);
+                    break;
+                case 6:
+                    System.out.println("Çıkış yapılıyor...");
+                    return;
+                default:
+                    System.out.println("Geçersiz bir seçim yaptınız.");
+            }
+        }
+    }
+
+    public static void bakiyeSorgula(String kullaniciAdi) {
+        double bakiye = hesaplar.get(kullaniciAdi).getBakiye();
+        System.out.println("Hesap bakiyeniz: " + bakiye + " TL");
+    }
+
+    public static void paraCek(String kullaniciAdi) {
+        System.out.println("Çekmek istediğiniz miktarı girin:");
+        double cekilecekMiktar = scanner.nextDouble();
+        double bakiye = hesaplar.get(kullaniciAdi).getBakiye();
+
+        if (cekilecekMiktar > bakiye) {
+            System.out.println("Yetersiz bakiye.");
+        } else {
+            Hesap hesap = hesaplar.get(kullaniciAdi);
+            hesap.setBakiye(bakiye - cekilecekMiktar);
+            String transaction = "Para çekildi: " + cekilecekMiktar + " TL";
+            hesap.getTransactionHistory().addTransaction(transaction);
+            System.out.println("Yeni bakiyeniz: " + hesap.getBakiye() + " TL");
+        }
+    }
+
+    public static void paraYatir(String kullaniciAdi) {
+        System.out.println("Yatırmak istediğiniz miktarı girin:");
+        double yatirilacakMiktar = scanner.nextDouble();
+        double bakiye = hesaplar.get(kullaniciAdi).getBakiye();
+
+        Hesap hesap = hesaplar.get(kullaniciAdi);
+        hesap.setBakiye(bakiye + yatirilacakMiktar);
+        String transaction = "Para yatırıldı: " + yatirilacakMiktar + " TL";
+        hesap.getTransactionHistory().addTransaction(transaction);
+        System.out.println("Yeni bakiyeniz: " + hesap.getBakiye() + " TL");
+    }
+
+    public static void paraTransferi(String kullaniciAdi) {
+        System.out.println("Transfer etmek istediğiniz kullanıcı adını girin:");
+        String aliciKullaniciAdi = scanner.nextLine();
+        if (!hesaplar.containsKey(aliciKullaniciAdi)) {
+            System.out.println("Geçersiz alıcı kullanıcı adı.");
+            return;
+        }
+
+        System.out.println("Transfer etmek istediğiniz miktarı girin:");
+        double transferMiktari = scanner.nextDouble();
+
+        Hesap gonderenHesap = hesaplar.get(kullaniciAdi);
+        Hesap aliciHesap = hesaplar.get(aliciKullaniciAdi);
+
+        if (transferMiktari > gonderenHesap.getBakiye()) {
+            System.out.println("Yetersiz bakiye.");
+            return;
+        }
+
+        gonderenHesap.setBakiye(gonderenHesap.getBakiye() - transferMiktari);
+        aliciHesap.setBakiye(aliciHesap.getBakiye() + transferMiktari);
+
+        String gonderenTransaction = "Transfer yapıldı: -" + transferMiktari + " TL (Alıcı: " + aliciKullaniciAdi + ")";
+        gonderenHesap.getTransactionHistory().addTransaction(gonderenTransaction);
+
+        String aliciTransaction = "Transfer alındı: +" + transferMiktari + " TL (Gönderen: " + kullaniciAdi + ")";
+        aliciHesap.getTransactionHistory().addTransaction(aliciTransaction);
+
+        System.out.println("Transfer başarılı.");
+    }
+
+    public static void islemGecmisiGoster(String kullaniciAdi) {
+        Hesap hesap = hesaplar.get(kullaniciAdi);
+        System.out.println("İşlem Geçmişi:");
+        System.out.println(hesap.getTransactionHistory().getHistory());
+    }
+}
