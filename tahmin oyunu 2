@@ -1,0 +1,26 @@
+import java.util.Scanner;
+public class test {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int tahminEdilecekSayi = (int) (Math.random() * 1000); // 0 ile 100 arasında rastgele bir sayı üretir
+        int tahmin = -1;
+        int denemeSayisi = 0;
+
+        System.out.println("0 ile 1000 arasında bir sayı tahmin edin.");
+
+        while (tahmin != tahminEdilecekSayi) {
+            System.out.print("Tahmininizi girin: ");
+            tahmin = scanner.nextInt();
+            denemeSayisi++;
+
+            if (tahmin < tahminEdilecekSayi) {
+                System.out.println("Daha büyük bir sayı girin.");
+            } else if (tahmin > tahminEdilecekSayi) {
+                System.out.println("Daha küçük bir sayı girin.");
+            } else {
+                System.out.println("Tebrikler, doğru tahmin! Sayı: " + tahminEdilecekSayi);
+                System.out.println("Deneme Sayısı: " + denemeSayisi);
+            }
+        }
+    }
+}
