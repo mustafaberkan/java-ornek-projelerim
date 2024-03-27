@@ -1,0 +1,102 @@
+import java.util.ArrayList;
+import java.util.Scanner;
+
+class Randevu {
+    private String hastaAdi;
+    private String doktorAdi;
+    private String tarih;
+
+    public Randevu(String hastaAdi, String doktorAdi, String tarih) {
+        this.hastaAdi = hastaAdi;
+        this.doktorAdi = doktorAdi;
+        this.tarih = tarih;
+    }
+
+    public String getHastaAdi() {
+        return hastaAdi;
+    }
+
+    public String getDoktorAdi() {
+        return doktorAdi;
+    }
+
+    public String getTarih() {
+        return tarih;
+    }
+}
+
+class Hastane {
+    private ArrayList<Randevu> randevular = new ArrayList<>();
+
+    public void randevuAl(String hastaAdi, String doktorAdi, String tarih) {
+        Randevu randevu = new Randevu(hastaAdi, doktorAdi, tarih);
+        randevular.add(randevu);
+        System.out.println("Randevu başarıyla alındı.");
+    }
+
+    public void randevulariGoster() {
+        if (randevular.isEmpty()) {
+            System.out.println("Hiç randevu bulunmamaktadır.");
+            return;
+        }
+        System.out.println("Randevular:");
+        for (Randevu randevu : randevular) {
+            System.out.println("Hasta: " + randevu.getHastaAdi() + ", Doktor: " + randevu.getDoktorAdi() + ", Tarih: " + randevu.getTarih());
+        }
+    }
+
+    public void randevuIptal(String hastaAdi, String tarih) {
+        for (int i = 0; i < randevular.size(); i++) {
+            if (randevular.get(i).getHastaAdi().equals(hastaAdi) && randevular.get(i).getTarih().equals(tarih)) {
+                randevular.remove(i);
+                System.out.println("Randevu başarıyla iptal edildi.");
+                return;
+            }
+        }
+        System.out.println("Belirtilen randevu bulunamadı.");
+    }
+}
+
+public class HastaneOtomasyonu {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        Hastane hastane = new Hastane();
+
+        while (true) {
+            System.out.println("1. Randevu Al");
+            System.out.println("2. Randevuları Göster");
+            System.out.println("3. Randevu İptal Et");
+            System.out.println("4. Çıkış");
+            System.out.print("Seçiminizi yapınız: ");
+            int secim = scanner.nextInt();
+            scanner.nextLine(); // Boş satırı oku
+
+            switch (secim) {
+                case 1:
+                    System.out.print("Hasta Adı: ");
+                    String hastaAdi = scanner.nextLine();
+                    System.out.print("Doktor Adı: ");
+                    String doktorAdi = scanner.nextLine();
+                    System.out.print("Randevu Tarihi: ");
+                    String tarih = scanner.nextLine();
+                    hastane.randevuAl(hastaAdi, doktorAdi, tarih);
+                    break;
+                case 2:
+                    hastane.randevulariGoster();
+                    break;
+                case 3:
+                    System.out.print("Hasta Adı: ");
+                    String iptalHastaAdi = scanner.nextLine();
+                    System.out.print("Randevu Tarihi: ");
+                    String iptalTarih = scanner.nextLine();
+                    hastane.randevuIptal(iptalHastaAdi, iptalTarih);
+                    break;
+                case 4:
+                    System.out.println("Programdan çıkılıyor...");
+                    return;
+                default:
+                    System.out.println("Geçersiz seçim. Lütfen tekrar deneyin.");
+            }
+        }
+    }
+}
