@@ -1,0 +1,67 @@
+import java.util.Scanner;
+
+public class test {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        String[] words = {"java", "programming", "adam", "mustafa", "bilim", "oyun","oprosos" };
+        String wordToGuess = words[(int) (Math.random() * words.length)];
+
+        int maxTries = 6;
+        int remainingTries = maxTries;
+        boolean[] guessedLetters = new boolean[wordToGuess.length()];
+
+        System.out.println("Adam Asmaca oyununa hoş geldiniz!");
+        System.out.println("Kelimeyi tahmin etmek için harfleri girin.");
+
+        while (remainingTries > 0) {
+            // Kelimeyi gösterme
+            for (int i = 0; i < wordToGuess.length(); i++) {
+                if (guessedLetters[i] || !Character.isLetter(wordToGuess.charAt(i))) {
+                    System.out.print(wordToGuess.charAt(i) + " ");
+                } else {
+                    System.out.print("_ ");
+                }
+            }
+            System.out.println();
+
+            // Kullanıcıdan harf girişi alma
+            System.out.print("Tahmininiz: ");
+            char guess = scanner.next().toLowerCase().charAt(0);
+
+            boolean found = false;
+            for (int i = 0; i < wordToGuess.length(); i++) {
+                if (wordToGuess.charAt(i) == guess) {
+                    guessedLetters[i] = true;
+                    found = true;
+                }
+            }
+
+            if (!found) {
+                remainingTries--;
+                System.out.println("Yanlış tahmin! Kalan hakkınız: " + remainingTries);
+            }
+
+            // Oyunun kazanılıp kazanılmadığını kontrol etme
+            boolean won = true;
+            for (boolean letterGuessed : guessedLetters) {
+                if (!letterGuessed) {
+                    won = false;
+                    break;
+                }
+            }
+
+            if (won) {
+                System.out.println("Tebrikler, kelimeyi doğru tahmin ettiniz: " + wordToGuess);
+                break;
+            }
+        }
+
+        // Oyunun sonucunu kontrol etme
+        if (remainingTries == 0) {
+            System.out.println("Oyunu kaybettiniz! Doğru kelime: " + wordToGuess);
+        }
+
+        scanner.close();
+    }
+}
