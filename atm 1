@@ -1,0 +1,132 @@
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
+
+public class atm2 {
+    private static Map<String, Hesap> hesaplar = new HashMap<>();
+    private static Scanner scanner = new Scanner(System.in);
+    
+    static class Hesap {
+        private String kullaniciAdi;
+        private String sifre;
+        private double bakiye;
+
+        public Hesap(String kullaniciAdi, String sifre, double bakiye) {
+            this.kullaniciAdi = kullaniciAdi;
+            this.sifre = sifre;
+            this.bakiye = bakiye;
+        }
+
+        public String getKullaniciAdi() {
+            return kullaniciAdi;
+        }
+
+        public String getSifre() {
+            return sifre;
+        }
+
+        public double getBakiye() {
+            return bakiye;
+        }
+
+        public void setBakiye(double bakiye) {
+            this.bakiye = bakiye;
+        }
+    }
+
+    public static void main(String[] args) {
+        hesaplar.put("mustafa", new Hesap("mustafa", "2105", 1000.0));
+        hesaplar.put("berkan", new Hesap("berkan", "2107", 2000.0));
+
+        girisYap();
+    }
+
+    public static void girisYap() {
+    	System.out.println("Kullanıcı Adı:");
+        String kullaniciAdi = scanner.nextLine();
+
+        System.out.println("Şifre:");
+        String sifre = scanner.nextLine();
+
+     
+        if (hesaplar.containsKey(kullaniciAdi) && sifreDogru(kullaniciAdi, sifre)) {
+            System.out.println("Giriş başarılı.");
+            while (true) {
+                menuGoster(kullaniciAdi);
+            }
+        } else {
+            System.out.println("Hatalı kullanıcı adı veya şifre.");
+        }
+    }
+   
+
+    public static boolean sifreDogru(String kullaniciAdi, String girilenSifre) {
+        if (hesaplar.containsKey(kullaniciAdi)) {
+            String gercekSifre = hesaplar.get(kullaniciAdi).getSifre();
+            return girilenSifre.equals(gercekSifre);
+        } else {
+            return false;
+        }
+    }
+
+    public static void menuGoster(String kullaniciAdi) {
+        System.out.println("\n1. Bakiye Sorgula");
+        System.out.println("2. Para Çek");
+        System.out.println("3. Para Yatır");
+        System.out.println("4. Çıkış");
+        System.out.println("Lütfen bir seçim yapınız:");
+
+        int secim = scanner.nextInt();
+        scanner.nextLine(); // Dummy nextLine() call to clear the input buffer
+
+        islemYap(kullaniciAdi, secim);
+    }
+
+    public static void islemYap(String kullaniciAdi, int secim) {
+        switch (secim) {
+            case 1:
+                bakiyeSorgula(kullaniciAdi);
+                break;
+            case 2:
+                paraCek(kullaniciAdi);
+                break;
+            case 3:
+                paraYatir(kullaniciAdi);
+                break;
+            case 4:
+                System.out.println("Çıkış yapılıyor...");
+                break;
+            default:
+                System.out.println("Geçersiz bir seçim yaptınız.");
+        }
+    }
+
+    public static void bakiyeSorgula(String kullaniciAdi) {
+        double bakiye = hesaplar.get(kullaniciAdi).getBakiye();
+        System.out.println("Hesap bakiyeniz: " + bakiye + " TL");
+    }
+
+    public static void paraCek(String kullaniciAdi) {
+        System.out.println("Çekmek istediğiniz miktarı girin:");
+        double cekilecekMiktar = scanner.nextDouble();
+        double bakiye = hesaplar.get(kullaniciAdi).getBakiye();
+        
+        if (cekilecekMiktar > bakiye) {
+            System.out.println("Yetersiz bakiye.");
+        } else {
+            Hesap hesap = hesaplar.get(kullaniciAdi);
+            hesap.setBakiye(bakiye - cekilecekMiktar);
+            System.out.println("Yeni bakiyeniz: " + hesap.getBakiye() + " TL");
+        }
+    }
+
+    public static void paraYatir(String kullaniciAdi) {
+        System.out.println("Yatırmak istediğiniz miktarı girin:");
+        double yatirilacakMiktar = scanner.nextDouble();
+        double bakiye = hesaplar.get(kullaniciAdi).getBakiye();
+        
+        Hesap hesap = hesaplar.get(kullaniciAdi);
+        hesap.setBakiye(bakiye + yatirilacakMiktar);
+        System.out.println("Yeni bakiyeniz: " + hesap.getBakiye() + " TL");
+    }
+}
