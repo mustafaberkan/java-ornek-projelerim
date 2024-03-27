@@ -1,0 +1,30 @@
+import java.util.Scanner;
+
+public class test {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int minRange = 1;
+        int maxRange = 100;
+
+        // Bilgisayarın rastgele bir sayı seçmesi
+        int randomNumber = (int) (Math.random() * (maxRange - minRange + 1)) + minRange;
+
+        System.out.println("1 ile 100 arasında bir sayı tahmin edin.");
+
+        int guess;
+        do {
+            System.out.print("Tahmininiz: ");
+            guess = scanner.nextInt();
+
+            if (guess < randomNumber) {
+                System.out.println("Daha yüksek bir sayı girin.");
+            } else if (guess > randomNumber) {
+                System.out.println("Daha düşük bir sayı girin.");
+            } else {
+                System.out.println("Tebrikler! Doğru tahmin ettiniz.");
+            }
+        } while (guess != randomNumber);
+
+        scanner.close();
+    }
+}
