@@ -1,0 +1,42 @@
+import java.util.Scanner;
+
+public class test {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Taş-Kağıt-Makas oyununa hoş geldiniz!");
+
+        while (true) {
+            System.out.print("Seçiminizi yapın (taş, kağıt, makas): ");
+            String userChoice = scanner.nextLine().toLowerCase();
+
+            if (!userChoice.equals("taş") && !userChoice.equals("kağıt") && !userChoice.equals("makas")) {
+                System.out.println("Geçersiz bir seçim yaptınız. Lütfen tekrar deneyin.");
+                continue;
+            }
+
+            String[] choices = {"taş", "kağıt", "makas"};
+            String computerChoice = choices[(int) (Math.random() * 3)];
+
+            System.out.println("Bilgisayarın seçimi: " + computerChoice);
+
+            if (userChoice.equals(computerChoice)) {
+                System.out.println("Berabere!");
+            } else if ((userChoice.equals("taş") && computerChoice.equals("makas")) ||
+                       (userChoice.equals("kağıt") && computerChoice.equals("taş")) ||
+                       (userChoice.equals("makas") && computerChoice.equals("kağıt"))) {
+                System.out.println("Kazandınız!");
+            } else {
+                System.out.println("Kaybettiniz!");
+            }
+
+            System.out.print("Tekrar oynamak ister misiniz? (evet/hayır): ");
+            String playAgain = scanner.nextLine().toLowerCase();
+            if (!playAgain.equals("evet")) {
+                break;
+            }
+        }
+
+        scanner.close();
+    }
+}
