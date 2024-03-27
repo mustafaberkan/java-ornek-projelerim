@@ -1,0 +1,51 @@
+import java.util.Scanner;
+public class hesap {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        double sayi1, sayi2;
+        char islem;
+
+        System.out.print("İlk sayıyı girin: ");
+        sayi1 = scanner.nextDouble();
+
+        System.out.print("İkinci sayıyı girin: ");
+        sayi2 = scanner.nextDouble();
+
+        System.out.print("İşlemi girin (+, -, *, /, ^, √): ");
+        islem = scanner.next().charAt(0);
+
+        double sonuc;
+
+        switch (islem) {
+            case '+':
+                sonuc = sayi1 + sayi2;
+                break;
+            case '-':
+                sonuc = sayi1 - sayi2;
+                break;
+            case '*':
+                sonuc = sayi1 * sayi2;
+                break;
+            case '/':
+                if (sayi2 != 0)
+                    sonuc = sayi1 / sayi2;
+                else {
+                    System.out.println("Bir sayıyı sıfıra bölemezsiniz.");
+                    return;
+                }
+                break;
+            case '^':
+                sonuc = Math.pow(sayi1, sayi2);
+                break;
+            case '√':
+                sonuc = Math.sqrt(sayi1);
+                break;
+            default:
+                System.out.println("Geçersiz işlem!");
+                return;
+        }
+
+        System.out.println("Sonuç: " + sonuc);
+    }
+}
