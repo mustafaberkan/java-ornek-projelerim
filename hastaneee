@@ -1,0 +1,357 @@
+package new21;
+import java.util.ArrayList;
+import java.util.Scanner;
+import java.util.stream.Stream;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.HashMap;
+
+class Sube {
+    private String subeAdi;
+    private String adres;
+
+    public Sube(String subeAdi, String adres) {
+        this.subeAdi = subeAdi;
+        this.adres = adres;
+    }
+
+    public String getSubeAdi() {
+        return subeAdi;
+    }
+
+    public String getAdres() {
+        return adres;
+    }
+}
+
+class Doktor {
+    private String ad;
+    private String soyad;
+    private String uzmanlik;
+
+    public Doktor(String ad, String soyad, String uzmanlik) {
+        this.ad = ad;
+        this.soyad = soyad;
+        this.uzmanlik = uzmanlik;
+    }
+
+    public String getAd() {
+        return ad;
+    }
+
+    public String getSoyad() {
+        return soyad;
+    }
+
+    public String getUzmanlik() {
+        return uzmanlik;
+    }
+}
+
+class Randevu {
+    private String hastaAdi;
+    private String doktorAdi;
+    private LocalDate tarih;
+    private LocalTime saat;
+    private String randevuNedeni;
+
+    public Randevu(String hastaAdi, String doktorAdi, LocalDate tarih, LocalTime saat, String randevuNedeni) {
+        this.hastaAdi = hastaAdi;
+        this.doktorAdi = doktorAdi;
+        this.tarih = tarih;
+        this.saat = saat;
+        this.randevuNedeni = randevuNedeni;
+    }
+
+    public String getHastaAdi() {
+        return hastaAdi;
+    }
+
+    public String getDoktorAdi() {
+        return doktorAdi;
+    }
+
+    public LocalDate getTarih() {
+        return tarih;
+    }
+
+    public LocalTime getSaat() {
+        return saat;
+    }
+
+    public String getRandevuNedeni() {
+        return randevuNedeni;
+    }
+}
+
+class Hastane {
+    private ArrayList<Sube> subeler = new ArrayList<>();
+    private ArrayList<Doktor> doktorlar = new ArrayList<>();
+    private ArrayList<Randevu> randevular = new ArrayList<>();
+
+    public void subeEkle(Sube sube) {
+        subeler.add(sube);
+    }
+
+    public void doktorEkle(Doktor doktor) {
+        doktorlar.add(doktor);
+    }
+
+    public boolean randevuCakisiyorMu(String doktorAdi, LocalDate tarih, LocalTime saat) {
+        for (Randevu randevu : randevular) {
+            if (randevu.getDoktorAdi().equals(doktorAdi) && randevu.getTarih().equals(tarih) && randevu.getSaat().equals(saat)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void randevuAl(String hastaAdi, String doktorAdi, LocalDate tarih, LocalTime saat, String randevuNedeni) {
+        if (hastaAdi.isEmpty() || doktorAdi.isEmpty() || tarih == null || saat == null) {
+            System.out.println("Hata: Lütfen tüm alanları doldurun.");
+            return;
+        }
+        if (tarih.isBefore(LocalDate.now())) {
+            System.out.println("Hata: Geçmiş tarihler için randevu alınamaz.");
+            return;
+        }
+        if (randevuCakisiyorMu(doktorAdi, tarih, saat)) {
+            System.out.println("Hata: Belirtilen doktor için bu tarih ve saatte zaten bir randevu var.");
+            return;
+        }
+        Randevu randevu = new Randevu(hastaAdi, doktorAdi, tarih, saat, randevuNedeni);
+        randevular.add(randevu);
+        System.out.println("Randevu başarıyla alındı.");
+    }
+
+    public void randevulariGoster() {
+        if (randevular.isEmpty()) {
+            System.out.println("Hiç randevu bulunmamaktadır.");
+            return;
+        }
+        System.out.println("Randevular:");
+        for (int i = 0; i < randevular.size(); i++) {
+            Randevu randevu = randevular.get(i);
+            System.out.println((i + 1) + ". Hasta: " + randevu.getHastaAdi() +
+                    ", Doktor: " + randevu.getDoktorAdi() +
+                    ", Tarih: " + randevu.getTarih().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) +
+                    ", Saat: " + randevu.getSaat().format(DateTimeFormatter.ofPattern("HH:mm")) +
+                    ", Neden: " + randevu.getRandevuNedeni());
+        }
+    }
+
+    public void randevuIptal(String hastaAdi) {
+        ArrayList<Randevu> iptalEdilecekRandevular = new ArrayList<>();
+        for (Randevu randevu : randevular) {
+            if (randevu.getHastaAdi().equals(hastaAdi)) {
+                iptalEdilecekRandevular.add(randevu);
+            }
+        }
+        if (iptalEdilecekRandevular.isEmpty()) {
+            System.out.println("Belirtilen hastaya ait randevu bulunamadı.");
+            return;
+        }
+
+        System.out.println("İptal etmek istediğiniz randevular:");
+        for (int i = 0; i < iptalEdilecekRandevular.size(); i++) {
+            Randevu randevu = iptalEdilecekRandevular.get(i);
+            System.out.println((i + 1) + ". Hasta: " + randevu.getHastaAdi() +
+                    ", Tarih: " + randevu.getTarih().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) +
+                    ", Saat: " + randevu.getSaat().format(DateTimeFormatter.ofPattern("HH:mm")) +
+                    ", Neden: " + randevu.getRandevuNedeni());
+        }
+
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("İptal etmek istediğiniz randevunun numarasını girin (iptal etmek için 0'a basın): ");
+        int secim = scanner.nextInt();
+        if (secim < 0 || secim > iptalEdilecekRandevular.size()) {
+            System.out.println("Geçersiz seçim.");
+            return;
+        } else if (secim == 0) {
+            System.out.println("İptal işlemi iptal edildi.");
+            return;
+        }
+
+        Randevu iptalEdilecekRandevu = iptalEdilecekRandevular.get(secim - 1);
+        System.out.println("İptal etmek istediğiniz randevu:");
+        System.out.println("Hasta: " + iptalEdilecekRandevu.getHastaAdi() +
+                ", Tarih: " + iptalEdilecekRandevu.getTarih().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) +
+                ", Saat: " + iptalEdilecekRandevu.getSaat().format(DateTimeFormatter.ofPattern("HH:mm")) +
+                ", Neden: " + iptalEdilecekRandevu.getRandevuNedeni());
+        System.out.print("Bu randevuyu iptal etmek istediğinizden emin misiniz? (Evet/Hayır): ");
+        scanner.nextLine(); 
+        String onay = scanner.nextLine().toLowerCase();
+        if (onay.equals("evet")) {
+            randevular.remove(iptalEdilecekRandevu);
+            System.out.println("Randevu başarıyla iptal edildi.");
+        } else {
+            System.out.println("İptal işlemi iptal edildi.");
+        }
+    }
+
+    public void randevuDegistir(String hastaAdi, LocalDate eskiTarih, LocalTime eskiSaat, LocalDate yeniTarih, LocalTime yeniSaat) {
+        for (Randevu randevu : randevular) {
+            if (randevu.getHastaAdi().equals(hastaAdi) && randevu.getTarih().equals(eskiTarih) && randevu.getSaat().equals(eskiSaat)) {
+                if (randevuCakisiyorMu(randevu.getDoktorAdi(), yeniTarih, yeniSaat)) {
+                    System.out.println("Hata: Belirtilen doktor için bu tarih ve saatte zaten bir randevu var.");
+                    return;
+                }
+                randevu = new Randevu(hastaAdi, randevu.getDoktorAdi(), yeniTarih, yeniSaat, randevu.getRandevuNedeni());
+                System.out.println("Randevu başarıyla değiştirildi.");
+                return;
+            }
+        }
+        System.out.println("Belirtilen randevu bulunamadı.");
+    }
+
+    public void randevuAra(String doktorAdi) {
+        boolean bulundu = false;
+        for (Randevu randevu : randevular) {
+            if (randevu.getDoktorAdi().equalsIgnoreCase(doktorAdi)) {
+                bulundu = true;
+                System.out.println("Hasta: " + randevu.getHastaAdi() +
+                    ", Tarih: " + randevu.getTarih().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) +
+                    ", Saat: " + randevu.getSaat().format(DateTimeFormatter.ofPattern("HH:mm")) +
+                    ", Neden: " + randevu.getRandevuNedeni());
+            }
+        }
+        if (!bulundu) {
+            System.out.println("Belirtilen doktora ait randevu bulunamadı.");
+        }
+    }
+
+    public void randevulariFiltrele(LocalDate baslangicTarihi, LocalDate bitisTarihi) {
+        boolean bulundu = false;
+        for (Randevu randevu : randevular) {
+            if ((randevu.getTarih().isEqual(baslangicTarihi) || randevu.getTarih().isAfter(baslangicTarihi)) &&
+                (randevu.getTarih().isEqual(bitisTarihi) || randevu.getTarih().isBefore(bitisTarihi))) {
+                bulundu = true;
+                System.out.println("Hasta: " + randevu.getHastaAdi() +
+                    ", Doktor: " + randevu.getDoktorAdi() +
+                    ", Tarih: " + randevu.getTarih().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) +
+                    ", Saat: " + randevu.getSaat().format(DateTimeFormatter.ofPattern("HH:mm")) +
+                    ", Neden: " + randevu.getRandevuNedeni());
+            }
+        }
+        if (!bulundu) {
+            System.out.println("Belirtilen tarihler arasında randevu bulunamadı.");
+        }
+    }
+
+    public void aylikRapor(LocalDate tarih) {
+        boolean bulundu = false;
+        for (Randevu randevu : randevular) {
+            if (randevu.getTarih().getYear() == tarih.getYear() && randevu.getTarih().getMonth() == tarih.getMonth()) {
+                bulundu = true;
+                System.out.println("Hasta: " + randevu.getHastaAdi() +
+                    ", Doktor: " + randevu.getDoktorAdi() +
+                    ", Tarih: " + randevu.getTarih().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) +
+                    ", Saat: " + randevu.getSaat().format(DateTimeFormatter.ofPattern("HH:mm")) +
+                    ", Neden: " + randevu.getRandevuNedeni());
+            }
+        }
+        if (!bulundu) {
+            System.out.println("Belirtilen ayda randevu bulunamadı.");
+        }
+    }
+}
+
+public class Tess {
+    public static void main(String[] args) {
+        try (Scanner scanner = new Scanner(System.in)) {
+            Hastane hastane = new Hastane();
+
+            while (true) {
+                System.out.println("1. Giriş yapınız");
+                System.out.println("2. Randevu Al");
+                System.out.println("3. Randevuları Göster");
+                System.out.println("4. Randevu İptal Et");
+                System.out.println("5. Randevu Değiştir");
+                System.out.println("6. Randevu Ara");
+                System.out.println("7. Randevuları Filtrele");
+                System.out.println("8. Aylık Rapor Al");
+                System.out.println("9. Çıkış");
+                System.out.print("Seçiminizi yapınız: ");
+                int secim = scanner.nextInt();
+                scanner.nextLine(); 
+
+                switch (secim) {
+                case 1:
+                	   System.out.print("kullanıcı adınız:");
+                       Stream<String> kullanıcıadı = scanner.next().lines();
+                       System.out.println("şifre:");
+                       int şifre = scanner.nextInt();
+                       System.out.println("Giriş Başarılı");
+                	break;
+                    case 2:
+                        System.out.print("Hasta Adı: ");
+                        String hastaAdi = scanner.nextLine();
+                        System.out.print("Doktor Adı: ");
+                        String doktorAdi = scanner.nextLine();
+                        System.out.print("Randevu Tarihi (gg.aa.yyyy): ");
+                        String tarihStr = scanner.nextLine();
+                        LocalDate tarih = LocalDate.parse(tarihStr, DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+                        System.out.print("Randevu Saati (ss:dd): ");
+                        String saatStr = scanner.nextLine();
+                        LocalTime saat = LocalTime.parse(saatStr, DateTimeFormatter.ofPattern("HH:mm"));
+                        System.out.print("Randevu Nedeni: ");
+                        String randevuNedeni = scanner.nextLine();
+                        hastane.randevuAl(hastaAdi, doktorAdi, tarih, saat, randevuNedeni);
+                        break;
+                    case 3:
+                        hastane.randevulariGoster();
+                        break;
+                    case 4:
+                        System.out.print("İptal etmek istediğiniz hastanın adını girin: ");
+                        String iptalHastaAdi = scanner.nextLine();
+                        hastane.randevuIptal(iptalHastaAdi);
+                        break;
+                    case 5:
+                        System.out.print("Hasta Adı: ");
+                        String degistirHastaAdi = scanner.nextLine();
+                        System.out.print("Eski Randevu Tarihi (gg.aa.yyyy): ");
+                        String eskiTarihStr = scanner.nextLine();
+                        LocalDate eskiTarih = LocalDate.parse(eskiTarihStr, DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+                        System.out.print("Eski Randevu Saati (ss:dd): ");
+                        String eskiSaatStr = scanner.nextLine();
+                        LocalTime eskiSaat = LocalTime.parse(eskiSaatStr, DateTimeFormatter.ofPattern("HH:mm"));
+                        System.out.print("Yeni Randevu Tarihi (gg.aa.yyyy): ");
+                        String yeniTarihStr = scanner.nextLine();
+                        LocalDate yeniTarih = LocalDate.parse(yeniTarihStr, DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+                        System.out.print("Yeni Randevu Saati (ss:dd): ");
+                        String yeniSaatStr = scanner.nextLine();
+                        LocalTime yeniSaat = LocalTime.parse(yeniSaatStr, DateTimeFormatter.ofPattern("HH:mm"));
+                        hastane.randevuDegistir(degistirHastaAdi, eskiTarih, eskiSaat, yeniTarih, yeniSaat);
+                        break;
+                    case 6:
+                        System.out.print("Aramak istediğiniz doktorun adını girin: ");
+                        String aramaDoktorAdi = scanner.nextLine();
+                        hastane.randevuAra(aramaDoktorAdi);
+                        break;
+                    case 7:
+                        System.out.print("Başlangıç Tarihi (gg.aa.yyyy): ");
+                        String baslangicTarihiStr = scanner.nextLine();
+                        LocalDate baslangicTarihi = LocalDate.parse(baslangicTarihiStr, DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+                        System.out.print("Bitiş Tarihi (gg.aa.yyyy): ");
+                        String bitisTarihiStr = scanner.nextLine();
+                        LocalDate bitisTarihi = LocalDate.parse(bitisTarihiStr, DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+                        hastane.randevulariFiltrele(baslangicTarihi, bitisTarihi);
+                        break;
+                    case 8:
+                        System.out.print("Rapor için Ay ve Yıl (gg.aa.yyyy formatında): ");
+                        String raporTarihStr = scanner.nextLine();
+                        LocalDate raporTarih = LocalDate.parse(raporTarihStr, DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+                        hastane.aylikRapor(raporTarih);
+                        break;
+                    case 9:
+                        System.out.println("Programdan çıkılıyor...");
+                        return;
+                    default:
+                        System.out.println("Geçersiz seçim. Lütfen tekrar deneyin.");
+                }
+            }
+        }
+    }
+}
